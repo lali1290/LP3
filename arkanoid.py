@@ -18,12 +18,12 @@ class Bloque(pygame.sprite.Sprite):
         elif (self.cont == 0):
             self.img.fill(255,0,0)
         else:
-            almacen.destruir(self.rect.x,self.rect.y)
-        
+            almacen.destruir(self.rect.x,self.rect.y) #si ya se acabaron las vidas del bloque, se destruye
 
 class Almacen(Bloque):
-    def __init__(self):
+    def __init__(self,puntaje):
         self.matriz = Bloque[10][3]
+        self.puntaje = 0
     
     def generar(self): #generacion de bloques
         for j in range(3):
@@ -33,6 +33,7 @@ class Almacen(Bloque):
                 
     def destruir(self,x,y):
         self.matriz[x/10][y/10] = None #eliminacion del bloque en la matriz
+        self.puntaje = self.puntaje+1
         
 
 class Pelota(pygame.sprite.Sprite):
@@ -44,8 +45,8 @@ class Pelota(pygame.sprite.Sprite):
         self.rect.y = 600-self.rect.height-20 #posicionamiento en y
     
     def chocar(self,bloque):
-        #logica para q cambie de direccion
-        bloque.colorear() #efecto del choque
+        if (bloque != None):
+            bloque.colorear() #efecto del choque
 
 class Barra(pygame.sprite.Sprite):
     def __init__(self):
@@ -70,7 +71,7 @@ def main():
     barra = Barra()
     pelota = Pelota()
     
-    # Preparar el inicio del juego
+    velocidad = [7,-7]
     
     ejecutando = True
     
@@ -79,8 +80,32 @@ def main():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+                
+        pelota.rect.move(velocidad) #movimiento normal de la pelota
         
-        if () #hacer un collision detect 
+        if (pelota.rect.y + pelota.rect.width == 582): #logica de cambio de direccion si choca con barra
+            if (pelota.rect.colliderect(barra.rect)):
+                if (velocidad[0] == -7):
+                    velocidad[0] = -1*velocidad[0]
+                velocidad[1] = -1*velocidad[1]
+        elif (): #logica de cuando choca con un bloque y determinacion de dicho bloque
+            rnd = random.randint(0,1)
+            if (rnd ==0):
+                velocidad[0] = -1*velocidad[0]
+            velocidad[1] = -1*velocidad[1]
+            todo pelota.chocar() #arreglar
+            if (almacen.puntaje ==30):
+                print("Felicitaciones, a ganado")
+                ejecutando = False
+            
+        
+        if ((pelota.rect.x > (800 - pelota.rect.width)) or (pelota.rect.x < 0)):
+            velocidad[0] = -1*velocidad[0]
+        if (pelota.rect.y < 0):
+            velocidad[1] = -1*velocidad[1]
+        
+        if (pelota,rect.colliderect()):
+            pelota.chocar()
     
         keys = pygame.key.get_pressed()
         
@@ -90,7 +115,15 @@ def main():
             barra.mover(10)
         
         pantalla.fill(0,0,0)
+        
+        pantalla.blit(pelota.img, pelota.rect)
         pantalla.blit(barra.img,barra.rect)
+        
+        for j in range(3):
+            for i in range(10):
+                if (almacen[i][j] != None):
+                    pantalla.blit(almacen[i][j].img, almacen[i][j].rect)
+                    
         pygame.display.flip()
         
         reloj.tick(60)
