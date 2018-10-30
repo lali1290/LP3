@@ -4,26 +4,26 @@ class Bloque(pygame.sprite.Sprite):
     def __init__(self,x,y,hp,color):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
         self.image = pygame.Surface((80,30)) #creacion del sprite
-        self.image.fill(color)
+        self.image.fill(color) #da color
         self.rect = self.image.get_rect() #se le da hitbox
         self.rect.x = x #posicionamiento
         self.rect.y = y #posicionamiento
         self.hp = hp #numero de vidas del bloque
         
-    def colorear(self, almacen):
+    def colorear(self):
         self.hp -=1
         if (self.hp == 1):
-            self.img.fill((0,255,0))
+            self.image.fill((0,255,0))
         elif (self.hp == 0):
-            self.img.fill((255,0,0))
+            self.image.fill((255,0,0))
         else:
-            almacen.destruir(self.rect.x,self.rect.y) #si ya se acabaron las vidas del bloque, se destruye
+            pygame.sprite.Sprite.kill(self) #si ya se acabaron las vidas del bloque, se destruye
 
 class Almacen(Bloque):
     def __init__(self):
         self.puntaje = 0
     
-    def generar(self,bloques): #generacion de bloques
+    def generar(self,bloques): #generacion de bloques y coloreado inicial
         for j in range(3):
             for i in range(10):
                 rnd = random.randint(0,2)
@@ -45,12 +45,12 @@ class Pelota(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
         self.image = pygame.Surface((45,30)) #creacion del sprite
-        self.image.fill((100,100,100))
+        self.image.fill((100,100,100)) #da color
         self.rect = self.image.get_rect() #se recrea su hitbox
         self.rect.x = 400-self.rect.width #posicionamiento en x
         self.rect.y = 600-self.rect.height-20 #posicionamiento en y
         
-    def mover(self,velocidad):
+    def mover(self,velocidad): #movimiento de la pelota
         self.rect.x += velocidad[0]
         self.rect.y += velocidad[1]
     
@@ -62,7 +62,7 @@ class Barra(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
         self.img = pygame.Surface((100,20)) #creacion del sprite
-        self.img.fill((100,100,100))
+        self.img.fill((100,100,100)) #da color
         self.rect = self.img.get_rect() #se le da hitbox
         self.rect.x = 400-self.rect.width #posicionamiento en x
         self.rect.y = 600-self.rect.height #posicionamiento en y
@@ -77,16 +77,16 @@ def main():
     pantalla = pygame.display.set_mode((800, 600))
     reloj = pygame.time.Clock()
     
-    bloques = pygame.sprite.Group()
+    bloques = pygame.sprite.Group() #crea un grupo de Sprites para los bloques
     
     almacen = Almacen()
     almacen.generar(bloques)
     barra = Barra()
     pelota = Pelota()
     
-    bloques.add(pelota)
-    
     velocidad = [7,-7]
+    
+    cont=1
     
     ejecutando = True
     
@@ -98,7 +98,9 @@ def main():
                 
         pelota.mover(velocidad) #movimiento normal de la pelota
         
-        if (pelota.rect.y + pelota.rect.width == 580): #logica de cambio de direccion si choca con barra
+        colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
+        
+        if (pelota.rect.y + pelota.rect.width >= 600): #logica de cambio de direccion si choca con barra
             if (pelota.rect.colliderect(barra.rect)):
                 if (velocidad[0] == -7):
                     velocidad[0] = -1*velocidad[0]
@@ -106,12 +108,13 @@ def main():
             else:
                 ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
                 print("Has perdido")
-        elif (): #logica de cuando choca con un bloque y determinacion de dicho bloque
+        elif (len(colisiones) >= cont): # (arreglar)si la lista no esta vacia es porq la pelota ha chocado con un bloque
             rnd = random.randint(0,1)
             if (rnd ==0):
                 velocidad[0] = -1*velocidad[0]
             velocidad[1] = -1*velocidad[1]
-            #todo pelota.chocar() #arreglar
+            colisiones[cont].colorear() #arreglar
+            cont +=1
             if (almacen.puntaje ==30):
                 print("Felicitaciones, a ganado")
                 ejecutando = False
@@ -120,9 +123,6 @@ def main():
             velocidad[0] = -1*velocidad[0]
         if (pelota.rect.y < 0):
             velocidad[1] = -1*velocidad[1]
-        
-        """if (pelota.rect.colliderect()):
-            pelota.chocar() """
     
         keys = pygame.key.get_pressed()
         
@@ -134,6 +134,8 @@ def main():
         pantalla.fill((70, 242, 216))
         
         pantalla.blit(barra.img,barra.rect)
+        
+        pantalla.blit(pelota.image,pelota.rect)
         
         bloques.draw(pantalla)
                     
