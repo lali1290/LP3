@@ -10,7 +10,7 @@ class Bloque(pygame.sprite.Sprite):
         self.rect.y = y #posicionamiento
         self.hp = hp #numero de vidas del bloque
         
-    def colorear(self):
+    def colorear(self,almacen):
         self.hp -=1
         if (self.hp == 1):
             self.image.fill((0,255,0))
@@ -18,6 +18,7 @@ class Bloque(pygame.sprite.Sprite):
             self.image.fill((255,0,0))
         else:
             pygame.sprite.Sprite.kill(self) #si ya se acabaron las vidas del bloque, se destruye
+            almacen.puntaje += 1
 
 class Almacen(Bloque):
     def __init__(self):
@@ -35,11 +36,6 @@ class Almacen(Bloque):
                     color = (255,0,0)
                 bloque = Bloque(i*80,j*30,rnd,color)
                 bloques.add(bloque)
-                
-    def destruir(self,x,y):
-        self.matriz[x/10][y/10] = None #eliminacion del bloque en la matriz
-        self.puntaje = self.puntaje+1
-        
 
 class Pelota(pygame.sprite.Sprite):
     def __init__(self):
@@ -86,7 +82,7 @@ def main():
     
     velocidad = [7,-7]
     
-    
+    "vidas = 3"
     
     ejecutando = True
     
@@ -107,15 +103,19 @@ def main():
                 velocidad[1] = -1*velocidad[1]
             else:
                 ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
-                print("Has perdido")
-        elif (len(colisiones) >= cont): # (arreglar)si la lista no esta vacia es porq la pelota ha chocado con un bloque
+                """vidas -= 1
+                if (vidas > 0):
+                    print("Le quedan " + vidas + ". Presione space para continuar")
+                else:"""
+                print("Game Over") #convertilo en un mensaje visible en la pantalla
+        elif (len(colisiones) >= cont): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
             rnd = random.randint(0,1)
             if (rnd ==0):
                 velocidad[0] = -1*velocidad[0]
             velocidad[1] = -1*velocidad[1]
-            colisiones[0].colorear() #arreglar
-            if (almacen.puntaje ==30):
-                print("Felicitaciones, a ganado")
+            colisiones[0].colorear(almacen)
+            if (almacen.puntaje == 30):
+                print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
                 ejecutando = False
         
         if ((pelota.rect.x > (800 - pelota.rect.width)) or (pelota.rect.x < 0)):
@@ -129,6 +129,13 @@ def main():
             barra.mover(-10)
         if keys[pygame.K_RIGHT]:
             barra.mover(10)
+            
+        """if (vidas > 0) and (keys[pygame.K_SPACE]):
+            pelota.rect.x = 400-pelota.rect.width #devolver la pelota a su posicion original en x
+            pelota.rect.y = 600-pelota.rect.height-20 #devolver la pelota a su posicion original en y
+            barra.rect.x = 400-barra.rect.width #devolver la barra a su posicion original en x
+            barra.rect.y = 600-barra.rect.height #devolver la barra a su posicion original en y
+            ejecutando = True"""
         
         pantalla.fill((70, 242, 216))
         
