@@ -86,7 +86,7 @@ def main():
     
     velocidad = [7,-7]
     
-    cont=1
+    
     
     ejecutando = True
     
@@ -97,7 +97,7 @@ def main():
                 sys.exit()
                 
         pelota.mover(velocidad) #movimiento normal de la pelota
-        
+        cont=1
         colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
         
         if (pelota.rect.y + pelota.rect.width >= 600): #logica de cambio de direccion si choca con barra
@@ -113,8 +113,7 @@ def main():
             if (rnd ==0):
                 velocidad[0] = -1*velocidad[0]
             velocidad[1] = -1*velocidad[1]
-            colisiones[cont].colorear() #arreglar
-            cont +=1
+            colisiones[0].colorear() #arreglar
             if (almacen.puntaje ==30):
                 print("Felicitaciones, a ganado")
                 ejecutando = False
