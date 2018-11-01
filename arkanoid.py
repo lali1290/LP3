@@ -131,39 +131,6 @@ def main():
             
             if (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
                 pelota.chocar(colisiones)
-            
-            """
-            if (pelota.rect.y + pelota.rect.height >= 581): #logica de cambio de direccion si choca con barra
-                if (pelota.rect.colliderect(barra.rect)):
-                    pelota.velocidad[1] = -1*pelota.velocidad[1]
-                else:
-                    ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
-                    vidas -= 1
-                    if (vidas > 0):
-                        texto = "Le quedan " + str(vidas) + ". Presione space para continuar"
-                        texto = fuente.render(texto, True, (0,0,0))
-                        pantalla.blit(texto, (400,300))
-                        print("Le quedan " + str(vidas) + ". Presione space para continuar")
-                    else:
-                        print("Game Over") #convertilo en un mensaje visible en la pantalla
-            elif (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
-                rnd = random.randint(0,1)
-                if (rnd ==0):
-                    pelota.velocidad[0] = -1*pelota.velocidad[0]
-                pelota.velocidad[1] = -1*pelota.velocidad[1]
-                colisiones[0].colorear(almacen)
-                if (almacen.puntaje == 30):
-                    texto = fuente.render("You WIN!!!", False, (255,0,0))
-                    pantalla.blit(texto, (400,300)) #arreglar
-                    print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
-                    #ejecutando = False
-            
-            
-            if ((pelota.rect.x >= (800 - pelota.rect.width)) or (pelota.rect.x <= 0)): #si la pelota se trata de salir por un costado, se le cambia la direccion de movimiento
-                pelota.velocidad[0] = -1*pelota.velocidad[0]
-            if (pelota.rect.y < 0):
-                pelota.velocidad[1] = -1*pelota.velocidad[1]
-            """
         
             keys = pygame.key.get_pressed()
             
