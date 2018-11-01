@@ -10,7 +10,7 @@ class Bloque(pygame.sprite.Sprite):
         self.rect.y = y #posicionamiento
         self.hp = hp #numero de vidas del bloque
         
-    def colorear(self,almacen):
+    def colorear(self,pelota):
         self.hp -=1
         if (self.hp == 1):
             self.image.fill((0,255,0))
@@ -18,11 +18,11 @@ class Bloque(pygame.sprite.Sprite):
             self.image.fill((255,0,0))
         else:
             pygame.sprite.Sprite.kill(self) #si ya se acabaron las vidas del bloque, se destruye
-            almacen.puntaje += 1
+            pelota.puntaje += 1
 
 class Almacen(Bloque):
     def __init__(self):
-        self.puntaje = 0
+        pass
     
     def generar(self,bloques): #generacion de bloques y coloreado inicial
         for j in range(3):
@@ -42,14 +42,49 @@ class Pelota(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
         self.image = pygame.Surface((25,25)) #creacion del sprite
         self.rect = self.image.get_rect() #se recrea su hitbox
+        self.velocidad = [7,-7]
+        self.vidas = 3
+        self.ejecutando = True
+        self.puntaje = 0
         
     def posicionar(self):
         self.rect.x = 400-self.rect.width #posicionamiento en x
         self.rect.y = 600-self.rect.height-20 #posicionamiento en y
         
-    def mover(self,velocidad): #movimiento de la pelota
-        self.rect.x += velocidad[0]
-        self.rect.y += velocidad[1]
+    def mover(self,barraRect): #movimiento de la pelota
+        self.rect.x += self.velocidad[0]
+        self.rect.y += self.velocidad[1]
+        
+        if (self.rect.y + self.rect.height >= 581): #logica de cambio de direccion si choca con barra
+            if (self.rect.colliderect(barraRect)):
+                self.velocidad[1] = -1*self.velocidad[1]
+            else:
+                self.ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
+                self.vidas -= 1
+                if (self.vidas > 0):
+                    """texto = "Le quedan " + str(vidas) + ". Presione space para continuar"
+                    texto = fuente.render(texto, True, (0,0,0))
+                    pantalla.blit(texto, (400,300))"""
+                    print("Le quedan " + str(self.vidas) + ". Presione space para continuar")
+                else:
+                    print("Game Over") #convertilo en un mensaje visible en la pantalla
+        
+        if ((self.rect.x >= (800 - self.rect.width)) or (self.rect.x <= 0)): #si la pelota se trata de salir por un costado, se le cambia la direccion de movimiento
+            self.velocidad[0] = -1*self.velocidad[0]
+        if (self.rect.y < 0):
+            self.velocidad[1] = -1*self.velocidad[1]
+        
+    def chocar(self,colisiones):
+            rnd = random.randint(0,1)
+            if (rnd ==0):
+                self.velocidad[0] = -1*self.velocidad[0]
+            self.velocidad[1] = -1*self.velocidad[1]
+            colisiones[0].colorear(self)
+            if (self.puntaje == 30):
+                """texto = fuente.render("You WIN!!!", False, (255,0,0))
+                pantalla.blit(texto, (400,300)) #arreglar """
+                print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
+                #ejecutando = False
 
 class Barra(pygame.sprite.Sprite):
     def __init__(self):
@@ -80,54 +115,55 @@ def main():
     barra = Barra()
     pelota = Pelota()
     
-    velocidad = [7,-7]
-    
-    vidas = 3
-    
-    while (vidas >= 1) and (almacen.puntaje != 30):
-        ejecutando = True
+    while (pelota.vidas >= 1) and (pelota.puntaje != 30):
+        pelota.ejecutando = True
         pelota.posicionar() #iniciar la posicion de la pelota
         barra.posicionar() #iniciar la posicion de la barra
         
-        while ejecutando:
+        while pelota.ejecutando:
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                     
-            pelota.mover(velocidad) #movimiento normal de la pelota
-            cont=1
+            pelota.mover(barra.rect) #movimiento normal de la pelota
             colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
             
+            if (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
+                pelota.chocar(colisiones)
+            
+            """
             if (pelota.rect.y + pelota.rect.height >= 581): #logica de cambio de direccion si choca con barra
                 if (pelota.rect.colliderect(barra.rect)):
-                    velocidad[1] = -1*velocidad[1]
+                    pelota.velocidad[1] = -1*pelota.velocidad[1]
                 else:
                     ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
                     vidas -= 1
                     if (vidas > 0):
-                        """texto = "Le quedan " + str(vidas) + ". Presione space para continuar"
+                        texto = "Le quedan " + str(vidas) + ". Presione space para continuar"
                         texto = fuente.render(texto, True, (0,0,0))
-                        pantalla.blit(texto, (400,300))"""
+                        pantalla.blit(texto, (400,300))
                         print("Le quedan " + str(vidas) + ". Presione space para continuar")
                     else:
                         print("Game Over") #convertilo en un mensaje visible en la pantalla
-            elif (len(colisiones) >= cont): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
+            elif (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
                 rnd = random.randint(0,1)
                 if (rnd ==0):
-                    velocidad[0] = -1*velocidad[0]
-                velocidad[1] = -1*velocidad[1]
+                    pelota.velocidad[0] = -1*pelota.velocidad[0]
+                pelota.velocidad[1] = -1*pelota.velocidad[1]
                 colisiones[0].colorear(almacen)
                 if (almacen.puntaje == 30):
-                    """texto = fuente.render("You WIN!!!", False, (255,0,0))
-                    pantalla.blit(texto, (400,300)) #arreglar """
+                    texto = fuente.render("You WIN!!!", False, (255,0,0))
+                    pantalla.blit(texto, (400,300)) #arreglar
                     print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
                     #ejecutando = False
             
+            
             if ((pelota.rect.x >= (800 - pelota.rect.width)) or (pelota.rect.x <= 0)): #si la pelota se trata de salir por un costado, se le cambia la direccion de movimiento
-                velocidad[0] = -1*velocidad[0]
+                pelota.velocidad[0] = -1*pelota.velocidad[0]
             if (pelota.rect.y < 0):
-                velocidad[1] = -1*velocidad[1]
+                pelota.velocidad[1] = -1*pelota.velocidad[1]
+            """
         
             keys = pygame.key.get_pressed()
             
