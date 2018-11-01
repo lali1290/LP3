@@ -40,8 +40,7 @@ class Almacen(Bloque):
 class Pelota(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
-        self.image = pygame.Surface((45,30)) #creacion del sprite
-        self.image.fill((100,100,100)) #da color
+        self.image = pygame.Surface((25,25)) #creacion del sprite
         self.rect = self.image.get_rect() #se recrea su hitbox
         self.rect.x = 400-self.rect.width #posicionamiento en x
         self.rect.y = 600-self.rect.height-20 #posicionamiento en y
@@ -96,10 +95,8 @@ def main():
         cont=1
         colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
         
-        if (pelota.rect.y + pelota.rect.width >= 600): #logica de cambio de direccion si choca con barra
+        if (pelota.rect.y + pelota.rect.height >= 581): #logica de cambio de direccion si choca con barra
             if (pelota.rect.colliderect(barra.rect)):
-                if (velocidad[0] == -7):
-                    velocidad[0] = -1*velocidad[0]
                 velocidad[1] = -1*velocidad[1]
             else:
                 ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
@@ -141,7 +138,7 @@ def main():
         
         pantalla.blit(barra.img,barra.rect)
         
-        pantalla.blit(pelota.image,pelota.rect)
+        pygame.draw.circle(pantalla,(100,100,100),(int(pelota.rect.x + pelota.rect.width/2), int(pelota.rect.y + pelota.rect.height/2)), 20)
         
         bloques.draw(pantalla)
                     
