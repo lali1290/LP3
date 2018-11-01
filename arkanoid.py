@@ -22,7 +22,7 @@ class Bloque(pygame.sprite.Sprite):
 
 class Almacen(Bloque):
     def __init__(self):
-        self.puntaje = 0
+        self.puntaje = 29
     
     def generar(self,bloques): #generacion de bloques y coloreado inicial
         for j in range(3):
@@ -71,6 +71,7 @@ def main():
     pygame.init()
     pantalla = pygame.display.set_mode((800, 600))
     reloj = pygame.time.Clock()
+    fuente = pygame.font.SysFont('Comic Sans MS', 200)
     
     bloques = pygame.sprite.Group() #crea un grupo de Sprites para los bloques
     
@@ -102,7 +103,9 @@ def main():
                 ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
                 """vidas -= 1
                 if (vidas > 0):
-                    print("Le quedan " + vidas + ". Presione space para continuar")
+                    texto = "Le quedan " + vidas + ". Presione space para continuar"
+                    texto = fuente.render(texto, True, (0,0,0))
+                    pantalla.blit(texto, (400,300))
                 else:"""
                 print("Game Over") #convertilo en un mensaje visible en la pantalla
         elif (len(colisiones) >= cont): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
@@ -112,8 +115,10 @@ def main():
             velocidad[1] = -1*velocidad[1]
             colisiones[0].colorear(almacen)
             if (almacen.puntaje == 30):
+                """texto = fuente.render("You WIN!!!", False, (255,0,0))
+                pantalla.blit(texto, (400,300)) #arreglar """
                 print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
-                ejecutando = False
+                #ejecutando = False
         
         if ((pelota.rect.x > (800 - pelota.rect.width)) or (pelota.rect.x < 0)):
             velocidad[0] = -1*velocidad[0]
