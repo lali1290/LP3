@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pygame,random,sys
 
 class Bloque(pygame.sprite.Sprite):
@@ -108,8 +110,8 @@ def main():
     barra = Barra()
     pelota = Pelota()
     fuente = pygame.font.SysFont('Showcard Gothic', 100)
-    fuente2 = fuente = pygame.font.SysFont('Showcard Gothic', 50)
-    texto = ""
+    fuente1 = pygame.font.SysFont('Showcard Gothic', 50)
+    fuente2 = pygame.font.SysFont('Showcard Gothic', 45)
     
     while (pelota.vidas >= 1) and (pelota.puntaje != 30):
         
@@ -127,21 +129,27 @@ def main():
                     if (evento.key == pygame.K_SPACE):
                         cond = True
             
-            keys = pygame.key.get_pressed()
-            
             if (cond):
                 pelota.mover(barra.rect) #movimiento normal de la pelota
-                texto = fuente2.render("",False,(0,0,0))
+                texto = fuente1.render("",False,(0,0,0))
+                texto1 = fuente1.render("",False,(0,0,0))
+                texto2 = fuente2.render("",False,(0,0,0))
             else:
                 if (pelota.vidas == 3):
-                    texto = fuente2.render("Presione SPACE para iniciar",False,(0,0,0))
+                    texto = fuente1.render("Presione SPACE para iniciar",False,(0,0,0))
+                    texto1 = fuente1.render("",False,(0,0,0))
+                    texto2 = fuente2.render("",False,(0,0,0))
                 else:
-                    texto = fuente2.render("Le quedan " + str(pelota.vidas) + " vidas."+"\nPresione space para continuar", False, (0,0,0))
-                
+                    texto = fuente1.render("",False,(0,0,0))
+                    texto1 = fuente1.render("Le quedan " + str(pelota.vidas) + " vidas.", False, (0,0,0))
+                    texto2 = fuente2.render("Presione space para continuar", False, (0,0,0))
+                    
             colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
                 
             if (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
                 pelota.chocar(colisiones)
+            
+            keys = pygame.key.get_pressed()
             
             if keys[pygame.K_LEFT]: #si se presiona la tecla derecha o izquierda se mueve la barra
                 if not (cond):
@@ -159,7 +167,9 @@ def main():
             pantalla.blit(barra.img,barra.rect)
             pygame.draw.circle(pantalla,(100,100,100),(int(pelota.rect.x + pelota.rect.width/2), int(pelota.rect.y + pelota.rect.height/2)), 15)
             bloques.draw(pantalla)
-            pantalla.blit(texto, (60,250))
+            pantalla.blit(texto, (40,250))
+            pantalla.blit(texto1, (180,250))
+            pantalla.blit(texto2, (40,310))
             pygame.display.flip()
             reloj.tick(60)
             
