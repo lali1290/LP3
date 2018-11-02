@@ -40,12 +40,13 @@ class Almacen(Bloque):
 class Pelota(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
-        self.image = pygame.Surface((25,25)) #creacion del sprite
+        self.image = pygame.Surface((27,27)) #creacion del sprite
         self.rect = self.image.get_rect() #se recrea su hitbox
-        self.velocidad = [7,-7]
-        self.vidas = 3
+        self.velocidad = [7,-7] #velocidad de la pelota
+        self.vidas = 3 #vidas del jugador al iniciar el juego
         self.ejecutando = True
         self.puntaje = 0
+        self.fuente = fuente = pygame.font.SysFont('Comic Sans MS', 200)
         
     def posicionar(self):
         self.rect.x = 400-self.rect.width #posicionamiento en x
@@ -63,7 +64,7 @@ class Pelota(pygame.sprite.Sprite):
                 self.vidas -= 1
                 if (self.vidas > 0):
                     """texto = "Le quedan " + str(vidas) + ". Presione space para continuar"
-                    texto = fuente.render(texto, True, (0,0,0))
+                    texto = self.fuente.render(texto, True, (0,0,0))
                     pantalla.blit(texto, (400,300))"""
                     print("Le quedan " + str(self.vidas) + ". Presione space para continuar")
                 else:
@@ -81,10 +82,10 @@ class Pelota(pygame.sprite.Sprite):
             self.velocidad[1] = -1*self.velocidad[1]
             colisiones[0].colorear(self)
             if (self.puntaje == 30):
-                """texto = fuente.render("You WIN!!!", False, (255,0,0))
+                """texto = self.fuente.render("You WIN!!!", False, (255,0,0))
                 pantalla.blit(texto, (400,300)) #arreglar """
                 print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
-                #ejecutando = False
+                self.ejecutando = False
 
 class Barra(pygame.sprite.Sprite):
     def __init__(self):
@@ -106,7 +107,6 @@ def main():
     pygame.init()
     pantalla = pygame.display.set_mode((800, 600))
     reloj = pygame.time.Clock()
-    fuente = pygame.font.SysFont('Comic Sans MS', 200)
     
     bloques = pygame.sprite.Group() #crea un grupo de Sprites para los bloques
     
