@@ -81,9 +81,6 @@ class Pelota(pygame.sprite.Sprite):
             self.velocidad[1] = -1*self.velocidad[1]
             colisiones[0].colorear(self)
             if (self.puntaje == 30):
-                """texto = self.fuente.render("You WIN!!!", False, (255,0,0))
-                self.pantalla.blit(texto, (400,300)) #arreglar """
-                print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
                 self.ejecutando = False
 
 class Barra(pygame.sprite.Sprite):
@@ -133,13 +130,17 @@ def main():
                     sys.exit()
                 elif evento.type == pygame.KEYDOWN:
                     if (evento.key == pygame.K_SPACE):
-                        cond = True 
+                        cond = True
             
             keys = pygame.key.get_pressed()
             
             if (cond):
                 pelota.mover(barra.rect) #movimiento normal de la pelota
             colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
+            
+            if not (cond):
+                texto = fuente.render("Le quedan " + str(pelota.vidas) + " vidas. Presione space para continuar", False, (0,0,0))
+                pantalla.blit(texto, (100,250))
             
             if (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
                 pelota.chocar(colisiones)
@@ -169,8 +170,12 @@ def main():
                 pygame.quit()
                 sys.exit()
                 
-        texto = fuente.render("GAME OVER!",False, (0,0,0))
-        pantalla.blit(texto, (100,250))
+        if pelota.vidas >=1:
+            texto = fuente.render("YOU WIN!",False, (0,0,0))
+            pantalla.blit(texto, (150,250))
+        else:
+            texto = fuente.render("GAME OVER!",False, (0,0,0))
+            pantalla.blit(texto, (100,250))
         pygame.display.flip()
         
 if __name__ == "__main__":
