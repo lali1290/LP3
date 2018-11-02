@@ -38,7 +38,7 @@ class Almacen(Bloque):
                 bloques.add(bloque)
 
 class Pelota(pygame.sprite.Sprite):
-    def __init__(self,pantalla):
+    def __init__(self):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
         self.image = pygame.Surface((27,27)) #creacion del sprite
         self.rect = self.image.get_rect() #se recrea su hitbox
@@ -46,8 +46,6 @@ class Pelota(pygame.sprite.Sprite):
         self.vidas = 3 #vidas del jugador al iniciar el juego
         self.ejecutando = True
         self.puntaje = 0
-        self.fuente = pygame.font.SysFont('Showcard Gothic', 200)
-        self.pantalla = pantalla
         
     def posicionar(self):
         self.rect.x = 400-self.rect.width+15 #posicionamiento en x
@@ -63,11 +61,6 @@ class Pelota(pygame.sprite.Sprite):
             else:
                 self.ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
                 self.vidas -= 1
-                if (self.vidas > 0):
-                    texto = "Le quedan " + str(self.vidas) + ". Presione space para continuar"
-                    texto = self.fuente.render(texto, False, (0,0,0))
-                    self.pantalla.blit(texto, (400,300))
-                    print("Le quedan " + str(self.vidas) + ". Presione space para continuar")
         
         if ((self.rect.x >= (800 - self.rect.width)) or (self.rect.x <= 0)): #si la pelota se trata de salir por un costado, se le cambia la direccion de movimiento
             self.velocidad[0] = -1*self.velocidad[0]
@@ -113,8 +106,10 @@ def main():
     almacen = Almacen()
     almacen.generar(bloques)
     barra = Barra()
-    pelota = Pelota(pantalla)
+    pelota = Pelota()
     fuente = pygame.font.SysFont('Showcard Gothic', 100)
+    fuente2 = fuente = pygame.font.SysFont('Showcard Gothic', 50)
+    texto = ""
     
     while (pelota.vidas >= 1) and (pelota.puntaje != 30):
         
@@ -136,12 +131,15 @@ def main():
             
             if (cond):
                 pelota.mover(barra.rect) #movimiento normal de la pelota
+                texto = fuente2.render("",False,(0,0,0))
+            else:
+                if (pelota.vidas == 3):
+                    texto = fuente2.render("Presione SPACE para iniciar",False,(0,0,0))
+                else:
+                    texto = fuente2.render("Le quedan " + str(pelota.vidas) + " vidas."+"\nPresione space para continuar", False, (0,0,0))
+                
             colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
-            
-            if not (cond):
-                texto = fuente.render("Le quedan " + str(pelota.vidas) + " vidas. Presione space para continuar", False, (0,0,0))
-                pantalla.blit(texto, (100,250))
-            
+                
             if (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
                 pelota.chocar(colisiones)
             
@@ -161,6 +159,7 @@ def main():
             pantalla.blit(barra.img,barra.rect)
             pygame.draw.circle(pantalla,(100,100,100),(int(pelota.rect.x + pelota.rect.width/2), int(pelota.rect.y + pelota.rect.height/2)), 15)
             bloques.draw(pantalla)
+            pantalla.blit(texto, (60,250))
             pygame.display.flip()
             reloj.tick(60)
             
