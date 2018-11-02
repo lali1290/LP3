@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pygame,random,sys
 
 class Bloque(pygame.sprite.Sprite):
@@ -69,7 +67,7 @@ class Pelota(pygame.sprite.Sprite):
         if (self.rect.y < 0):
             self.velocidad[1] = -1*self.velocidad[1]
         
-    def chocar(self,colisiones):
+    def chocar(self,colisiones): #efecto de cuando la pelota golpea un bloque
             rnd = random.randint(0,1)
             if (rnd ==0):
                 self.velocidad[0] = -1*self.velocidad[0]
@@ -96,7 +94,7 @@ class Barra(pygame.sprite.Sprite):
     def moverConPelota(self,direc,pelota):
         if (not (self.rect.x > (800-self.rect.width) and (direc == 10))) and (not((self.rect.x < 0) and (direc ==-10))):
             self.rect.x = self.rect.x + direc #mover la barra
-            pelota.rect.x = pelota.rect.x + direc
+            pelota.rect.x = pelota.rect.x + direc #mover la pelota junto a la barra
             
 def main():
     pygame.init()
@@ -129,13 +127,13 @@ def main():
                     if (evento.key == pygame.K_SPACE):
                         cond = True
             
-            if (cond):
+            if (cond): #si ya presiono space, se inicia el movimiento de la pelota
                 pelota.mover(barra.rect) #movimiento normal de la pelota
                 texto = fuente1.render("",False,(0,0,0))
                 texto1 = fuente1.render("",False,(0,0,0))
                 texto2 = fuente2.render("",False,(0,0,0))
             else:
-                if (pelota.vidas == 3):
+                if (pelota.vidas == 3): #genera texto a mostrar segun las condiciones
                     texto = fuente1.render("Presione SPACE para iniciar",False,(0,0,0))
                     texto1 = fuente1.render("",False,(0,0,0))
                     texto2 = fuente2.render("",False,(0,0,0))
