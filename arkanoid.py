@@ -38,7 +38,7 @@ class Almacen(Bloque):
                 bloques.add(bloque)
 
 class Pelota(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,pantalla):
         pygame.sprite.Sprite.__init__(self) #llamada al constructor de la clase padre
         self.image = pygame.Surface((27,27)) #creacion del sprite
         self.rect = self.image.get_rect() #se recrea su hitbox
@@ -46,7 +46,8 @@ class Pelota(pygame.sprite.Sprite):
         self.vidas = 3 #vidas del jugador al iniciar el juego
         self.ejecutando = True
         self.puntaje = 0
-        self.fuente = fuente = pygame.font.SysFont('Comic Sans MS', 200)
+        self.fuente = pygame.font.SysFont('Showcard Gothic', 200)
+        self.pantalla = pantalla
         
     def posicionar(self):
         self.rect.x = 400-self.rect.width+15 #posicionamiento en x
@@ -63,12 +64,10 @@ class Pelota(pygame.sprite.Sprite):
                 self.ejecutando = False #si no ha chocado con la barra es porque ya se le fue la bola y ha perdido
                 self.vidas -= 1
                 if (self.vidas > 0):
-                    """texto = "Le quedan " + str(vidas) + ". Presione space para continuar"
-                    texto = self.fuente.render(texto, True, (0,0,0))
-                    pantalla.blit(texto, (400,300))"""
+                    texto = "Le quedan " + str(self.vidas) + ". Presione space para continuar"
+                    texto = self.fuente.render(texto, False, (0,0,0))
+                    self.pantalla.blit(texto, (400,300))
                     print("Le quedan " + str(self.vidas) + ". Presione space para continuar")
-                else:
-                    print("Game Over") #convertilo en un mensaje visible en la pantalla
         
         if ((self.rect.x >= (800 - self.rect.width)) or (self.rect.x <= 0)): #si la pelota se trata de salir por un costado, se le cambia la direccion de movimiento
             self.velocidad[0] = -1*self.velocidad[0]
@@ -83,7 +82,7 @@ class Pelota(pygame.sprite.Sprite):
             colisiones[0].colorear(self)
             if (self.puntaje == 30):
                 """texto = self.fuente.render("You WIN!!!", False, (255,0,0))
-                pantalla.blit(texto, (400,300)) #arreglar """
+                self.pantalla.blit(texto, (400,300)) #arreglar """
                 print("You WIN!!!") #convertilo en un mensaje visible en la pantalla
                 self.ejecutando = False
 
@@ -117,7 +116,8 @@ def main():
     almacen = Almacen()
     almacen.generar(bloques)
     barra = Barra()
-    pelota = Pelota()
+    pelota = Pelota(pantalla)
+    fuente = pygame.font.SysFont('Showcard Gothic', 100)
     
     while (pelota.vidas >= 1) and (pelota.puntaje != 30):
         
@@ -168,6 +168,10 @@ def main():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+                
+        texto = fuente.render("GAME OVER!",False, (0,0,0))
+        pantalla.blit(texto, (100,250))
+        pygame.display.flip()
         
 if __name__ == "__main__":
     main()
