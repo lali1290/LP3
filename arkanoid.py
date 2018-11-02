@@ -49,7 +49,7 @@ class Pelota(pygame.sprite.Sprite):
         self.fuente = fuente = pygame.font.SysFont('Comic Sans MS', 200)
         
     def posicionar(self):
-        self.rect.x = 400-self.rect.width #posicionamiento en x
+        self.rect.x = 400-self.rect.width-35 #posicionamiento en x
         self.rect.y = 600-self.rect.height-20 #posicionamiento en y
         
     def mover(self,barraRect): #movimiento de la pelota
@@ -102,6 +102,10 @@ class Barra(pygame.sprite.Sprite):
         if (not (self.rect.x > (800-self.rect.width) and (direc == 10))) and (not((self.rect.x < 0) and (direc ==-10))):
             self.rect.x = self.rect.x + direc #mover la barra
             
+    def moverConPelota(self,direc,pelota):
+        if (not (self.rect.x > (800-self.rect.width) and (direc == 10))) and (not((self.rect.x < 0) and (direc ==-10))):
+            self.rect.x = self.rect.x + direc #mover la barra
+            pelota.rect.x = pelota.rect.x + direc
             
 def main():
     pygame.init()
@@ -115,29 +119,46 @@ def main():
     barra = Barra()
     pelota = Pelota()
     
+    
     while (pelota.vidas >= 1) and (pelota.puntaje != 30):
-        pelota.ejecutando = True
+        
         pelota.posicionar() #iniciar la posicion de la pelota
         barra.posicionar() #iniciar la posicion de la barra
+        cond = False
+        pelota.ejecutando = True
         
         while pelota.ejecutando:
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                    
-            pelota.mover(barra.rect) #movimiento normal de la pelota
+                elif evento.type == pygame.KEYDOWN:
+                    if (evento.key == pygame.K_SPACE):
+                        cond = True 
+            
+            keys = pygame.key.get_pressed()
+            
+            
+            if (cond):
+                pelota.mover(barra.rect) #movimiento normal de la pelota
             colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
             
             if (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
                 pelota.chocar(colisiones)
         
-            keys = pygame.key.get_pressed()
+            
             
             if keys[pygame.K_LEFT]: #si se presiona la tecla derecha o izquierda se mueve la barra
-                barra.mover(-10)
+                if not (cond):
+                    barra.moverConPelota(-10,pelota)
+                else:
+                    barra.mover(-10)
+                    
             if keys[pygame.K_RIGHT]:
-                barra.mover(10)
+                if not (cond):
+                    barra.moverConPelota(10,pelota)
+                else:
+                    barra.mover(10)
             
             pantalla.fill((70, 242, 216))
             
@@ -150,6 +171,12 @@ def main():
             pygame.display.flip()
             
             reloj.tick(60)
+            
+    while True:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
         
 if __name__ == "__main__":
     main()
