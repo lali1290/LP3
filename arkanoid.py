@@ -49,7 +49,7 @@ class Pelota(pygame.sprite.Sprite):
         self.fuente = fuente = pygame.font.SysFont('Comic Sans MS', 200)
         
     def posicionar(self):
-        self.rect.x = 400-self.rect.width-35 #posicionamiento en x
+        self.rect.x = 400-self.rect.width+15 #posicionamiento en x
         self.rect.y = 600-self.rect.height-20 #posicionamiento en y
         
     def mover(self,barraRect): #movimiento de la pelota
@@ -95,7 +95,7 @@ class Barra(pygame.sprite.Sprite):
         self.rect = self.img.get_rect() #se le da hitbox
         
     def posicionar(self):
-        self.rect.x = 400-self.rect.width #posicionamiento en x
+        self.rect.x = 400-self.rect.width +50 #posicionamiento en x
         self.rect.y = 600-self.rect.height #posicionamiento en y
     
     def mover(self,direc):
@@ -119,7 +119,6 @@ def main():
     barra = Barra()
     pelota = Pelota()
     
-    
     while (pelota.vidas >= 1) and (pelota.puntaje != 30):
         
         pelota.posicionar() #iniciar la posicion de la pelota
@@ -138,15 +137,12 @@ def main():
             
             keys = pygame.key.get_pressed()
             
-            
             if (cond):
                 pelota.mover(barra.rect) #movimiento normal de la pelota
             colisiones = pygame.sprite.spritecollide(pelota, bloques, False) #devuelve una lista de colisiones entre la pelota y los bloques
             
             if (len(colisiones) >= 1): #si la lista no esta vacia es porq la pelota ha chocado con un bloque
                 pelota.chocar(colisiones)
-        
-            
             
             if keys[pygame.K_LEFT]: #si se presiona la tecla derecha o izquierda se mueve la barra
                 if not (cond):
@@ -161,15 +157,10 @@ def main():
                     barra.mover(10)
             
             pantalla.fill((70, 242, 216))
-            
             pantalla.blit(barra.img,barra.rect)
-            
             pygame.draw.circle(pantalla,(100,100,100),(int(pelota.rect.x + pelota.rect.width/2), int(pelota.rect.y + pelota.rect.height/2)), 15)
-            
             bloques.draw(pantalla)
-                        
             pygame.display.flip()
-            
             reloj.tick(60)
             
     while True:
