@@ -1,0 +1,212 @@
+import pygame
+from random import randint
+FPS=60
+ANCHO=800
+ALTO=600
+
+class Barra(pygame.sprite.Sprite): #Creamos la clase de la barra
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        
+        self.barra = pygame.image.load("barra2.jpg") #importamos la imagen de la barra
+        self.rect = self.barra.get_rect() #obtenemos sus dimensiones
+        self.rect.centerx = ANCHO/2 #posicion en x
+        self.rect.centery = ALTO-10 #posición en y
+        self.velocidad = 10 #velocidad de la barra
+        self.vida = True #estado del juego
+        
+    
+    def dibujar(self,superficie): #metodo para dibujar la barra
+        superficie.blit(self.barra, self.rect)
+    def movimiento(self,jugador):# metodo para le movimiento
+        keys = pygame.key.get_pressed()
+        if self.rect.left <= 0:#limites para no salir de la parte visible de la ventana
+            self.rect.left =0
+        elif self.rect.right >= 800:
+            self.rect.right = 800
+            
+        if keys[pygame.K_LEFT]:
+            jugador.rect.left -= jugador.velocidad
+        
+        if keys[pygame.K_RIGHT]:
+            jugador.rect.right += jugador.velocidad
+
+class Pelotita(pygame.sprite.Sprite):#clase de la pelota
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        
+        self.pelotita = pygame.image.load("pelotita6.png")#exportamos la imagen
+        self.rect_pelotita = self.pelotita.get_rect()#obtenemos dimensiones de la pelota
+        self.rect_pelotita.centerx = (ANCHO/2 + 50) - self.rect_pelotita.width#posición x
+        self.rect_pelotita.centery = ALTO  - self.rect_pelotita.height #posición y
+        self.velocidad = 5#velocidad de la pelota
+        self.vector = 0#variable auxiliar para saber a donde si edirige
+        self.direccion = 1#variación ded la dirección
+    def trayectoria(self):##movimiento de la pelota
+        if self.rect_pelotita.x > (800 - self.rect_pelotita.width):# para que no se valla de la pantalla
+            if self.direccion == 1:
+                self.vector = 4 # seleccionamos la direccción
+            else:
+                self.vector =3# seleccionamos la direccción
+            
+        elif self.rect_pelotita.y > (600 - self.rect_pelotita.height):# para que no se valla de la pantalla
+            if self.direccion == 1:
+                self.vector = 3# seleccionamos la direccción
+            else:
+                self.vector = 1# seleccionamos la direccción
+            
+            
+        elif self.rect_pelotita.x < 0:# para que no se valla de la pantalla
+            if self.direccion == 1:
+                self.vector = 1# seleccionamos la direccción
+            else:
+                self.vector = 2# seleccionamos la direccción
+                
+        elif self.rect_pelotita.y < 0:# para que no se valla de la pantalla
+            if self.direccion == 1:
+                self.vector = 3# seleccionamos la direccción
+            else:
+                self.vector =1# seleccionamos la direccción
+            
+            
+        if self.vector ==1:# seleccionamos la direccción
+            self.rect_pelotita.x +=  self.velocidad
+            self.rect_pelotita.y +=  self.velocidad
+            print(self.direccion)
+        elif self.vector == 2:# seleccionamos la direccción
+            print(self.direccion)
+            self.rect_pelotita.x += self.velocidad 
+            self.rect_pelotita.y -= self.velocidad 
+            print("x")
+        elif self.vector == 3:# seleccionamos la direccción
+            print(self.direccion)
+            self.rect_pelotita.x -= self.velocidad 
+            self.rect_pelotita.y += self.velocidad 
+            print("x")
+        elif self.vector == 4:# seleccionamos la direccción
+            print(self.direccion)
+            self.rect_pelotita.x -= self.velocidad 
+            self.rect_pelotita.y -= self.velocidad 
+        elif self.vector ==0:# seleccionamos la direccción
+            print(self.direccion)
+            self.rect_pelotita.x += self.velocidad 
+            self.rect_pelotita.y -= self.velocidad
+                
+    def dibujar(self, superficie):#dibujamos la pelota en la pantalla
+        superficie.blit(self.pelotita, self.rect_pelotita)
+    def colision(self,pelotita, jugador, listaBloques):#metodo de coliscioon
+        if pelotita.rect_pelotita.colliderect(jugador.rect):#cuando la pelota choca con la barra
+                if self.direccion ==1:
+                    self.vector = 4
+                else:
+                    self.vector = 2                   
+                self.direccion = -self.direccion
+                
+                
+        for b in listaBloques:#cuando la pelota choca con un bloque
+            if pelotita.rect_pelotita.colliderect(b.bloque):
+                listaBloques.remove(b)
+                if self.direccion ==1:
+                    self.vector = 1
+                else:
+                    self.vector = 3
+                self.direccion = -self.direccion
+                
+        
+                
+class Bloque(pygame.sprite.Sprite):#clase de los bloques
+    def __init__(self, posx, posy):
+        self.bloque = pygame.Rect(posx,posy,100,50)
+            
+    def dibujar(self, superficie):
+        num = randint(1,10)#dibuja un bloque, hay dos coloes que se intercambian
+        if num < 5:
+            color = pygame.Color(20,20,20)
+        else:
+            color = pygame.Color(40,50,60)
+        pygame.draw.rect(superficie,(color),(self.bloque))
+    
+
+def main():
+    pygame.init()
+    pantalla = pygame.display.set_mode((ANCHO,ALTO))#creamos la pantalla
+    pygame.display.set_caption("Akanoid xxdx")#nombre del archivo
+    
+    empezar= False#estado del juego
+    clock = pygame.time.Clock()
+    ejecutando = True#estaado del programa 
+    jugador = Barra() #creamoos un objeto jugador/barra
+    pelotita = Pelotita() #creamos un objeto pelota
+    posicion_bloquex =0 #posición inicial bloque x y y 
+    posicion_bloquey =0
+    listaBloques =[] #lista de bloques
+    aux=1 #auxiliar para el tiempo
+    #fuentes y textos
+    Fuente = pygame.font.SysFont("Arial",30)
+    mensaje = pygame.font.SysFont("Arial",100)
+    texto = mensaje.render("GAME OVER ",0,(120,70,100))
+    texto2 = mensaje.render("WINNER ",0,(120,70,100))
+    
+    for i in range (0,8):#creación de la lista de bloques
+            for j in range (0,3):
+                block= Bloque(posicion_bloquex,posicion_bloquey)
+                listaBloques.append(block)
+                
+                posicion_bloquey = posicion_bloquey+ 50
+                j=j+1
+            posicion_bloquey = 0
+            posicion_bloquex = posicion_bloquex +100
+            i=i+1
+    
+    
+    while ejecutando == True:#inicio del juego
+        Tiempo = pygame.time.get_ticks()/1000#obtenner la velocidad para el tiempo
+        if aux == Tiempo:#tiempo
+            aux=+1
+            print(Tiempo)
+        for evento in pygame.event.get():#eventos 
+            if evento.type == pygame.QUIT:
+                ejecutando = False
+            elif evento.type == pygame.MOUSEBUTTONDOWN:#empezamoso el juego con un click 
+                empezar = True
+                
+        jugador.movimiento(jugador)#metodo para mover la barra
+        
+        pantalla.fill((255,255,255))#llenamos el fonod
+        jugador.dibujar(pantalla) #dibujamos a la barra
+        pelotita.dibujar(pantalla) #dibujamos la pelota
+        
+        for b in listaBloques:
+            b.dibujar(pantalla)#dibujamos los bloques
+        
+        
+        if empezar == True: #movimiento de la pelota y su colición
+            pelotita.colision(pelotita,jugador,listaBloques)
+            pelotita.trayectoria()
+            
+        if jugador.vida == True:#para saber cuando pierde
+            
+            if pelotita.rect_pelotita.y > (600 - pelotita.rect_pelotita.height):
+                
+                jugador.vida = False
+                
+        else:
+            pantalla.blit(texto,(150, 100))#tecto de game over
+            empezar = False
+        
+        if listaBloques == False:
+            pelotita.velocidad = 0
+            pantalla.blit(texto2,(150, 100))#texto de ganador
+            
+        
+        contador = Fuente.render("Tiempo : "+str(Tiempo),0,(120,70,0)) #texto de tiempo
+        
+        pantalla.blit(contador,(100,100)) #texto de tiempo
+        pygame.display.update()#actualizanción del juego
+        clock.tick(FPS)
+    
+    
+    pygame.quit()
+        
+if __name__=="__main__":
+    main()
