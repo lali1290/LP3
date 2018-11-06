@@ -187,3 +187,44 @@ def main():
         
 if __name__ == "__main__":
     main()
+
+    
+las barras de arriba
+class Barra(pygame.sprite.Sprite):
+    def __init__(self,screen,color,x,y):
+        pygame.sprite.Sprite.__init__(self)
+        self.barras=pygame.Surface((100,30))
+        self.color=color
+        #self.barras.fill(color)
+        #self.rect=self.barras.get_rect()
+        self.x=x
+        self.y=y
+        self.rect=Rect(self.x,self.y,100,30)
+        self.screen=screen#pantalla
+        barras=pygame.draw.rect(self.screen,self.color,self.rect)
+     
+def main():
+    pygame.init()#iniciando el motor de juego
+    size=(900,500)#establecer el ancho y alto de la pantalla 
+    screen=pygame.display.set_mode(size)#para abrir una ventana 
+    screen.fill(BLANCO)
+    reloj = pygame.time.Clock()#es para no me acuerdo :3
+    agrupar=[]
+    for x in range (9):
+        for y in range (3):
+            c1 =random.uniform(1,254)
+            c2 =random.uniform(1,254)
+            c3 =random.uniform(1,254)
+            colores=[c1,c2,c3]
+            agrupar.append(Barra(screen,colores,x*100,y*30))
+
+    
+    while True:
+        f=pygame.key.get_pressed()
+        reloj.tick(150)#es el cambio de bits?bits por segundo?? o algo asi. es como la actualizacion de actualizacion de la pantalla
+        pygame.display.flip()#mostrar todo lo que se coloca en la pantalla, lo actualiza
+        for event in pygame.event.get():# Iteramos sobre cada evento de la cola de eventos            
+            if event.type == pygame.QUIT:# Verificamos el tipo de evento.
+                pygame.quit()#si no lo pongo el prograama se cuelga
+                sys.exit()#ni la mas minima idea :u
+            
